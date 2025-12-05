@@ -110,7 +110,7 @@ vm/reboot:
 	@SSHPASS=$$($(GET_PASS)) \
 	$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
 		sudo reboot now; \
-	" >/dev/null
+	" >/dev/null || true
 
 vm/update:
 	@SSHPASS=$$($(GET_PASS)) $(MAKE) vm/copy
