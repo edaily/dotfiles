@@ -113,8 +113,11 @@ vm/reboot:
 	" >/dev/null || true
 
 vm/update:
+	@echo "copying into vm..."
 	@SSHPASS=$$($(GET_PASS)) $(MAKE) vm/copy
+	@echo "switching..."
 	@SSHPASS=$$($(GET_PASS)) $(MAKE) vm/switch
+	@echo "rebooting..."
 	@SSHPASS=$$($(GET_PASS)) $(MAKE) vm/reboot
 
 # copy our secrets into the VM
