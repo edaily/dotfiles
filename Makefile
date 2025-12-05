@@ -12,6 +12,13 @@ NIXNAME ?= vm-aarch64
 # SSH options that are used. These aren't meant to be overridden but are
 # reused a lot so we just store them up here.
 SSH_OPTIONS=-o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no 
+SSHPASS_PREFIX :=
+ifdef SSHPASS
+SSHPASS_PREFIX := sshpass -e
+endif
+
+# Command to fetch the password from 1Password
+GET_PASS := op item get zosovg44lzbzkhooy7itc43oce --reveal --format json --fields password | jq -r .value
 
 switch:
 	sudo NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --impure --flake ".#${NIXNAME}"
@@ -100,33 +107,32 @@ vm/bootstrap:
 	"
 
 vm/reboot:
-	ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
+	SSHPASS=$$($(GET_PASS)) \
+	$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
 		sudo reboot now; \
 	"
 
 vm/update:
-	$(MAKE) vm/copy
-	$(MAKE) vm/switch
-	ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
-		sudo reboot; \
-	"
+	SSHPASS=$$($(GET_PASS)) $(MAKE) vm/copy
+	SSHPASS=$$($(GET_PASS)) $(MAKE) vm/switch
+	SSHPASS=$$($(GET_PASS)) $(MAKE) vm/reboot
 
 # copy our secrets into the VM
 vm/secrets:
 	# GPG keyring
-	rsync -av -e 'ssh $(SSH_OPTIONS)' \
+	rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
 		--exclude='.#*' \
 		--exclude='S.*' \
 		--exclude='*.conf' \
 		$(HOME)/.gnupg/ $(NIXUSER)@$(NIXADDR):~/.gnupg
 	# SSH keys
-	rsync -av -e 'ssh $(SSH_OPTIONS)' \
+	rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
 		--exclude='environment' \
 		$(HOME)/.ssh/ $(NIXUSER)@$(NIXADDR):~/.ssh
 
 # copy the Nix configurations into the VM.
 vm/copy:
-	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
+	rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
 		--exclude='vendor/' \
 		--exclude='.git/' \
 		--exclude='.git-crypt/' \
@@ -138,7 +144,7 @@ vm/copy:
 # run the nixos-rebuild switch command. This does NOT copy files so you
 # have to run vm/copy before.
 vm/switch:
-	ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
+	$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
 		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" \
 	"
 
