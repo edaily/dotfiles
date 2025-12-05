@@ -107,46 +107,46 @@ vm/bootstrap:
 	"
 
 vm/reboot:
-	SSHPASS=$$($(GET_PASS)) \
+	@SSHPASS=$$($(GET_PASS)) \
 	$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
 		sudo reboot now; \
-	"
+	" >/dev/null
 
 vm/update:
-	SSHPASS=$$($(GET_PASS)) $(MAKE) vm/copy
-	SSHPASS=$$($(GET_PASS)) $(MAKE) vm/switch
-	SSHPASS=$$($(GET_PASS)) $(MAKE) vm/reboot
+	@SSHPASS=$$($(GET_PASS)) $(MAKE) vm/copy
+	@SSHPASS=$$($(GET_PASS)) $(MAKE) vm/switch
+	@SSHPASS=$$($(GET_PASS)) $(MAKE) vm/reboot
 
 # copy our secrets into the VM
 vm/secrets:
 	# GPG keyring
-	rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
+	@rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
 		--exclude='.#*' \
 		--exclude='S.*' \
 		--exclude='*.conf' \
-		$(HOME)/.gnupg/ $(NIXUSER)@$(NIXADDR):~/.gnupg
+		$(HOME)/.gnupg/ $(NIXUSER)@$(NIXADDR):~/.gnupg >/dev/null
 	# SSH keys
-	rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
+	@rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
 		--exclude='environment' \
-		$(HOME)/.ssh/ $(NIXUSER)@$(NIXADDR):~/.ssh
+		$(HOME)/.ssh/ $(NIXUSER)@$(NIXADDR):~/.ssh >/dev/null
 
 # copy the Nix configurations into the VM.
 vm/copy:
-	rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
+	@rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
 		--exclude='vendor/' \
 		--exclude='.git/' \
 		--exclude='.git-crypt/' \
 		--exclude='.jj/' \
 		--exclude='iso/' \
 		--rsync-path="sudo rsync" \
-		$(MAKEFILE_DIR)/ $(NIXUSER)@$(NIXADDR):/nix-config
+		$(MAKEFILE_DIR)/ $(NIXUSER)@$(NIXADDR):/nix-config >/dev/null
 
 # run the nixos-rebuild switch command. This does NOT copy files so you
 # have to run vm/copy before.
 vm/switch:
-	$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
+	@$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
 		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" \
-	"
+	" >/dev/null
 
 # Build a WSL installer
 .PHONY: wsl
