@@ -1,6 +1,6 @@
 # This function creates a NixOS system based on our VM setup for a
 # particular architecture.
-{ nixpkgs, overlays, inputs }:
+{ nixpkgs, inputs }:
 
 name:
 {
@@ -24,7 +24,6 @@ in systemFunc rec {
   inherit system;
 
   modules = [
-    { nixpkgs.overlays = overlays; }
     { nixpkgs.config.allowUnfree = true; }
     (inputs.nix-snapd.nixosModules.default)
     machineConfig
@@ -36,6 +35,9 @@ in systemFunc rec {
       home-manager.users.${user} = import userHMConfig {
         inputs = inputs;
       };
+      home-manager.sharedModules = [
+        inputs.nixvim.homeModules.nixvim
+      ];
     }
     {
       config._module.args = {

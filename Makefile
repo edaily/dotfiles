@@ -1,5 +1,5 @@
 # Connectivity info for Linux VM
-NIXADDR ?= unset
+NIXADDR ?= 192.168.2.130
 NIXPORT ?= 22
 NIXUSER ?= eugene
 
@@ -26,16 +26,6 @@ switch:
 test:
 	sudo NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild test --impure --flake ".#$(NIXNAME)"
 
-# This builds the given NixOS configuration and pushes the results to the
-# cache. This does not alter the current running system. This requires
-# cachix authentication to be configured out of band.
-cache:
-	nix build '.#nixosConfigurations.$(NIXNAME).config.system.build.toplevel' --json \
-		| jq -r '.[].outputs | to_entries[].value' \
-		| cachix push mitchellh-nixos-config
-
-# Backup secrets so that we can transer them to new machines via
-# sneakernet or other means.
 .PHONY: secrets/backup
 secrets/backup:
 	tar -czvf $(MAKEFILE_DIR)/backup.tar.gz \
@@ -60,13 +50,6 @@ secrets/restore:
 	chmod 600 $(HOME)/.ssh/* || true
 	chmod 700 $(HOME)/.gnupg/* || true
 
-# bootstrap a brand new VM. The VM should have NixOS ISO on the CD drive
-# and just set the password of the root user to "root". This will install
-# NixOS. After installing NixOS, you must reboot and set the root password
-# for the next step.
-#
-# NOTE(mitchellh): I'm sure there is a way to do this and bootstrap all
-# in one step but when I tried to merge them I got errors. One day.
 vm/bootstrap0:
 	ssh $(SSH_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
 		parted /dev/nvme0n1 -- mklabel gpt; \
@@ -151,7 +134,5 @@ vm/switch:
 		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" \
 	" >/dev/null
 
-# Build a WSL installer
-.PHONY: wsl
-wsl:
-	 nix build ".#nixosConfigurations.wsl.config.system.build.installer"
+mac/update:
+	sudo nix run nix-darwin -- switch --flake .#macbook

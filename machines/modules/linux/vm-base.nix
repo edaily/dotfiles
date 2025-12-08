@@ -1,22 +1,14 @@
 { config, pkgs, lib, currentSystem, currentSystemName, currentSystemUser, ... }:
 
 {
+  imports = [
+    ../common/nix-settings.nix
+    ../common/fonts.nix
+    ./wayland.nix
+  ];
+
   # Be careful updating this.
   boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  nix = {
-    package = pkgs.nixVersions.latest;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-      keep-outputs = true
-      keep-derivations = true
-    '';
-
-    settings = {
-      substituters = ["https://mitchellh-nixos-config.cachix.org"];
-      trusted-public-keys = ["mitchellh-nixos-config.cachix.org-1:bjEbXJyLrL1HZZHBbO4QALnI5faYZppzkU4D2s0G8RQ="];
-    };
-  };
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -35,23 +27,13 @@
     enable = true;
   };
 
-  services.tailscale.enable = false;
+
   users.mutableUsers = false;
-
-  fonts = {
-    fontDir.enable = true;
-
-    packages = [
-      pkgs.fira-code
-      pkgs.jetbrains-mono
-    ];
-  };
 
   environment.systemPackages = with pkgs; [
     cachix
     gnumake
     killall
-    xclip
     xclip
     ghostty
     swaybg
@@ -71,8 +53,6 @@
   services.xserver = {
     enable = true;
   };
-
-  services.displayManager.ly.enable = true;
   
   services.greetd = {
     enable = true;
@@ -97,15 +77,6 @@
   programs.niri = {
     enable = true;
     package = pkgs.niri;
-  };
-
-
-  environment.variables = {
-    NIXOS_OZONE_WL = "1"; # Electron/Chromium on Wayland
-    MOZ_ENABLE_WAYLAND = "1"; # Firefox Wayland
-    WLR_RENDERER_ALLOW_SOFTWARE = "1"; # allow software rendering in VMs
-    WLR_NO_HARDWARE_CURSORS = "1"; # fixes invisible cursor in some VMs
-    LIBGL_ALWAYS_SOFTWARE = "1"; # Force software rendering for all apps (fixes Ghostty/Walker crashes)
   };
 
   # Enable the OpenSSH daemon.

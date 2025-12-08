@@ -41,6 +41,7 @@ binds {
 
     Mod+T { spawn "ghostty"; }
     Mod+W { close-window; }
+    Mod+O { spawn "rofi -show run"; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }

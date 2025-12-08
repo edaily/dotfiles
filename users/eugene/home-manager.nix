@@ -5,12 +5,14 @@
 let
   sources = import ../../nix/sources.nix;
   isLinux = pkgs.stdenv.isLinux;
-
-  shellAliases = {
-    vi = "nvim";
-    vim = "nvim";
-  };
 in {
+  imports = [
+    ./programs
+  ];
+
+  # Make inputs available to all imported modules
+  _module.args.inputs = inputs;
+
   home.stateVersion = "18.09";
   home.enableNixpkgsReleaseCheck = false;
 
@@ -30,7 +32,11 @@ in {
     pkgs.nil
     pkgs.lua-language-server
     pkgs.nodePackages.typescript-language-server
-
+    pkgs.sshpass
+    pkgs.rustc
+    pkgs.cargo
+    pkgs.claude-code
+  ] ++ (lib.optionals isLinux [
     # Hyprland session essentials
     pkgs.ghostty
     pkgs.waybar
@@ -38,9 +44,11 @@ in {
     pkgs.wl-clipboard
     pkgs.wlogout
     pkgs.polkit_gnome
+    pkgs._1password-cli
+  ]) ++ [
     (pkgs.writeShellApplication {
       name = "random-wallpaper";
-      runtimeInputs = [ pkgs.swaybg pkgs.coreutils pkgs.findutils ];
+      runtimeInputs = [ pkgs.coreutils pkgs.findutils ] ++ (lib.optionals isLinux [ pkgs.swaybg ]);
       text = builtins.readFile ./scripts/random-wallpaper.sh;
     })
   ];
@@ -61,14 +69,14 @@ in {
   xdg.configFile."niri/config.kdl".source = ./niri/config.kdl;
   xdg.configFile."ghostty/config".source = ./ghostty/config;
   
-  home.pointerCursor = {
+  home.pointerCursor = lib.mkIf isLinux {
     gtk.enable = true;
     package = pkgs.bibata-cursors;
     name = "Bibata-Modern-Classic";
     size = 18;
   };
 
-  gtk = {
+  gtk = lib.mkIf isLinux {
     enable = true;
 
     theme = {
@@ -87,54 +95,5 @@ in {
     };
   };
 
-  programs.nushell = {
-    enable = true;
-    configFile.source = ./nushell/config.nu;
-    shellAliases = shellAliases;
-  };
-
-  programs.go = {
-    enable = true;
-    env.GOPATH = "code/go";
-  };
-
-  programs.git = {
-    enable = true;
-    settings = {
-      user = {
-        name = "Eugene";
-        email = "eugene@builtbyeugene.com";
-      };
-      branch.autosetuprebase = "always";
-      color.ui = true;
-      core.askPass = ""; # needs to be empty to use terminal for ask pass
-      credential.helper = "store"; # want to make this more secure
-      github.user = "edaily";
-      push.default = "tracking";
-      init.defaultBranch = "main";
-    };
-  };
-
-  programs.neovim = {
-    enable = true;
-    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
-    
-    viAlias = true;
-    vimAlias = true;
-    defaultEditor = true;
-
-    extraConfig = ''
-      highlight Normal guibg=NONE ctermbg=NONE
-      highlight NonText guibg=NONE ctermbg=NONE
-    '';
-
-    plugins = with pkgs.vimPlugins; [
-      nvim-lspconfig
-      nvim-cmp
-      cmp-nvim-lsp
-      luasnip
-      cmp_luasnip
-    ];
-  };
-
 }
+

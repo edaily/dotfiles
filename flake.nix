@@ -24,11 +24,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # I think technically you're not supposed to override the nixpkgs
     # used by neovim but recently I had failures if I didn't pin to my
     # own. We can always try to remove that anytime.
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
+    };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     # Non-flakes
@@ -40,26 +50,22 @@
     fish-foreign-env.flake = false;
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: let
-    # Overlays is the list of overlays we want to apply from flake inputs.
-    overlays = [
-      (final: prev: rec {
-        # gh CLI on stable has bugs.
-        gh = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.gh;
-
-        ibus = ibus_stable;
-        ibus_stable = inputs.nixpkgs.legacyPackages.${prev.system}.ibus;
-        ibus_1_5_29 = inputs.nixpkgs-old-ibus.legacyPackages.${prev.system}.ibus;
-        ibus_1_5_31 = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.ibus;
-      })
-    ];
-
+  outputs = { self, nixpkgs, home-manager, nix-darwin, ... }@inputs: let
     mkSystem = import ./lib/mksystem.nix {
-      inherit overlays nixpkgs inputs;
+      inherit nixpkgs inputs;
+    };
+
+    mkDarwin = import ./lib/mkdarwin.nix {
+      inherit nixpkgs inputs;
     };
   in {
-    nixosConfigurations.vm-aarch64 = mkSystem "vm-aarch64" {
+    nixosConfigurations.vm-aarch64 = mkSystem "linux/vm-aarch64" {
       system = "aarch64-linux";
+      user   = "eugene";
+    };
+
+    darwinConfigurations.macbook = mkDarwin "darwin/macbook" {
+      system = "aarch64-darwin";
       user   = "eugene";
     };
   };
