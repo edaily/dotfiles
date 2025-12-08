@@ -6,9 +6,7 @@ let
   sources = import ../../nix/sources.nix;
   isLinux = pkgs.stdenv.isLinux;
 in {
-  imports = [
-    ./programs
-  ];
+  imports = [ ./programs ];
 
   # Make inputs available to all imported modules
   _module.args.inputs = inputs;
@@ -36,6 +34,7 @@ in {
     pkgs.rustc
     pkgs.cargo
     pkgs.claude-code
+    pkgs.nixfmt
   ] ++ (lib.optionals isLinux [
     # Hyprland session essentials
     pkgs.ghostty
@@ -48,7 +47,8 @@ in {
   ]) ++ [
     (pkgs.writeShellApplication {
       name = "random-wallpaper";
-      runtimeInputs = [ pkgs.coreutils pkgs.findutils ] ++ (lib.optionals isLinux [ pkgs.swaybg ]);
+      runtimeInputs = [ pkgs.coreutils pkgs.findutils ]
+        ++ (lib.optionals isLinux [ pkgs.swaybg ]);
       text = builtins.readFile ./scripts/random-wallpaper.sh;
     })
   ];
@@ -64,11 +64,10 @@ in {
     PAGER = "less -FirSwX";
   };
 
-
   xdg.configFile."wallpapers".source = ./wallpapers;
   xdg.configFile."niri/config.kdl".source = ./niri/config.kdl;
   xdg.configFile."ghostty/config".source = ./ghostty/config;
-  
+
   home.pointerCursor = lib.mkIf isLinux {
     gtk.enable = true;
     package = pkgs.bibata-cursors;

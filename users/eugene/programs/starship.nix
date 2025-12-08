@@ -3,7 +3,7 @@
 {
   programs.starship = {
     enable = true;
-    
+
     settings = {
       # Format: configure what modules are shown
       format = lib.concatStrings [

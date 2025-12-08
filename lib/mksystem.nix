@@ -3,16 +3,13 @@
 { nixpkgs, inputs }:
 
 name:
-{
-  system,
-  user,
-}:
+{ system, user, }:
 
 let
 
   # True if Linux, which is a heuristic for not being Darwin.
   isLinux = true;
-  
+
   # The config files for this system.
   machineConfig = ../machines/${name}.nix;
   userOSConfig = ../users/${user}/nixos.nix;
@@ -28,16 +25,13 @@ in systemFunc rec {
     (inputs.nix-snapd.nixosModules.default)
     machineConfig
     userOSConfig
-    home-manager.home-manager {
+    home-manager.home-manager
+    {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.backupFileExtension = "backup";
-      home-manager.users.${user} = import userHMConfig {
-        inputs = inputs;
-      };
-      home-manager.sharedModules = [
-        inputs.nixvim.homeModules.nixvim
-      ];
+      home-manager.users.${user} = import userHMConfig { inputs = inputs; };
+      home-manager.sharedModules = [ inputs.nixvim.homeModules.nixvim ];
     }
     {
       config._module.args = {

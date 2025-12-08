@@ -30,8 +30,8 @@
   homebrew.onActivation.autoUpdate = true;
   homebrew.global.brewfile = true;
 
-  homebrew.taps = [];
-  homebrew.brews = [];
+  homebrew.taps = [ ];
+  homebrew.brews = [ ];
   homebrew.casks = [
     "1password"
     "1password-cli"

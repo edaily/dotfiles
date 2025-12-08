@@ -1,11 +1,7 @@
 { config, pkgs, lib, currentSystem, currentSystemName, currentSystemUser, ... }:
 
 {
-  imports = [
-    ../common/nix-settings.nix
-    ../common/fonts.nix
-    ./wayland.nix
-  ];
+  imports = [ ../common/nix-settings.nix ../common/fonts.nix ./wayland.nix ];
 
   # Be careful updating this.
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -23,37 +19,33 @@
   security.sudo.wheelNeedsPassword = false;
 
   virtualisation.docker.enable = true;
-  virtualisation.lxd = {
-    enable = true;
-  };
-
+  virtualisation.lxd = { enable = true; };
 
   users.mutableUsers = false;
 
-  environment.systemPackages = with pkgs; [
-    cachix
-    gnumake
-    killall
-    xclip
-    ghostty
-    swaybg
+  environment.systemPackages = with pkgs;
+    [
+      cachix
+      gnumake
+      killall
+      xclip
+      ghostty
+      swaybg
 
-    # For hypervisors that support auto-resizing, this script forces it.
-    # I've noticed not everyone listens to the udev events so this is a hack.
-    # (writeShellScriptBin "xrandr-auto" ''
-    #   xrandr --output Virtual-1 --auto
-    # '')
-  ] ++ lib.optionals (currentSystemName == "vm-aarch64") [
-    # This is needed for the vmware user tools clipboard to work.
-    # You can test if you don't need this by deleting this and seeing
-    # if the clipboard sill works.
-    gtkmm3
-  ];
+      # For hypervisors that support auto-resizing, this script forces it.
+      # I've noticed not everyone listens to the udev events so this is a hack.
+      # (writeShellScriptBin "xrandr-auto" ''
+      #   xrandr --output Virtual-1 --auto
+      # '')
+    ] ++ lib.optionals (currentSystemName == "vm-aarch64") [
+      # This is needed for the vmware user tools clipboard to work.
+      # You can test if you don't need this by deleting this and seeing
+      # if the clipboard sill works.
+      gtkmm3
+    ];
 
-  services.xserver = {
-    enable = true;
-  };
-  
+  services.xserver = { enable = true; };
+
   services.greetd = {
     enable = true;
     settings = {
@@ -62,7 +54,8 @@
         user = "${currentSystemUser}";
       };
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.niri}/bin/niri-session";
+        command =
+          "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.niri}/bin/niri-session";
         user = "greeter";
       };
     };
@@ -83,7 +76,7 @@
   services.openssh.enable = true;
   services.openssh.settings.PasswordAuthentication = true;
   services.openssh.settings.PermitRootLogin = "yes";
-  
+
   networking.firewall.enable = false;
   system.stateVersion = "20.09";
 }

@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 
-let
-  isLinux = pkgs.stdenv.isLinux;
+let isLinux = pkgs.stdenv.isLinux;
 in {
   programs.rofi = {
     enable = isLinux;
