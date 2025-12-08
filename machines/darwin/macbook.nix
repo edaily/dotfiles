@@ -32,14 +32,6 @@
 
   homebrew.taps = [ ];
   homebrew.brews = [ ];
-  homebrew.casks = [
-    "1password"
-    "1password-cli"
-    "ghostty"
-    "rectangle"
-    "google-chrome"
-    "discord"
-    "balenaetcher"
-    "whatsapp"
-  ];
+  homebrew.casks =
+    [ "1password" "1password-cli" "ghostty" "rectangle" "google-chrome" "discord" "balenaetcher" "whatsapp" ];
 }

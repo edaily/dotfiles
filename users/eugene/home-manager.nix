@@ -47,8 +47,7 @@ in {
   ]) ++ [
     (pkgs.writeShellApplication {
       name = "random-wallpaper";
-      runtimeInputs = [ pkgs.coreutils pkgs.findutils ]
-        ++ (lib.optionals isLinux [ pkgs.swaybg ]);
+      runtimeInputs = [ pkgs.coreutils pkgs.findutils ] ++ (lib.optionals isLinux [ pkgs.swaybg ]);
       text = builtins.readFile ./scripts/random-wallpaper.sh;
     })
   ];

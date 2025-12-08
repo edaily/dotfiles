@@ -138,4 +138,4 @@ mac/update:
 	sudo nix run nix-darwin -- switch --flake .#macbook
 
 fmt:
-	find . -name '*.nix' -type f -exec nixfmt {} \;
+	find . -name '*.nix' -type f -exec nixfmt -w 120 {} \;
