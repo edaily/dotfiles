@@ -35,6 +35,8 @@ in {
     pkgs.cargo
     pkgs.claude-code
     pkgs.nixfmt
+    pkgs.opencode
+    pkgs.jellyfin
   ] ++ (lib.optionals isLinux [
     # Hyprland session essentials
     pkgs.ghostty
