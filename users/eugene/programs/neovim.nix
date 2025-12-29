@@ -5,6 +5,8 @@
     enable = true;
     package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
 
+    extraPlugins = [ pkgs.vimPlugins.catppuccin-nvim ];
+
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;

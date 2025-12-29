@@ -12,7 +12,7 @@ echo "copying to desktop..."
 echo "switching..."
 "${SCRIPT_DIR}/switch.sh"
 
-echo "rebooting..."
-"${SCRIPT_DIR}/reboot.sh"
+# echo "rebooting..."
+# "${SCRIPT_DIR}/reboot.sh"
 
 echo "Desktop update complete"
