@@ -6,6 +6,11 @@ in {
     enable = isLinux;
     package = pkgs.rofi-wayland;
     font = "JetBrainsMono Nerd Font 14";
-    theme = "gruvbox-dark-hard";
+    theme = ../rofi/theme.rasi;
+    terminal = "${pkgs.ghostty}/bin/ghostty";
+    extraConfig = {
+      modi = "drun,run";
+      show-icons = true;
+    };
   };
 }

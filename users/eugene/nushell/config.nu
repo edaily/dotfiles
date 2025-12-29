@@ -11,6 +11,7 @@ if ("/opt/homebrew/bin" | path exists) {
 
 # Add Nix paths
 $env.PATH = ($env.PATH | prepend [
+    "/run/wrappers/bin"
     "/run/current-system/sw/bin"
     "/nix/var/nix/profiles/default/bin"
     "/etc/profiles/per-user/eugene/bin"

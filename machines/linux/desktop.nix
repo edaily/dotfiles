@@ -20,6 +20,7 @@
 
   # Platform
   nixpkgs.hostPlatform = "x86_64-linux";
+  system.stateVersion = "25.05";
 
   # Time zone
   time.timeZone = "Australia/Melbourne";
@@ -46,6 +47,10 @@
 
 
 
+  # Bluetooth
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+
   # Passwordless sudo for rsync (needed for make desktop/copy)
   security.sudo.extraRules = [{
     users = [ "eugene" ];
@@ -54,6 +59,15 @@
       options = [ "NOPASSWD" ];
     }];
   }];
+
+
+  # Graphics drivers
+  hardware.graphics.extraPackages = with pkgs; [
+    intel-media-driver
+    vaapiIntel
+    vaapiVdpau
+    libvdpau-va-gl
+  ];
 
   # System packages
   environment.systemPackages = with pkgs; [

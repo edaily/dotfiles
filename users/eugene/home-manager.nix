@@ -34,7 +34,7 @@ in {
     pkgs.rustc
     pkgs.cargo
     pkgs.claude-code
-    pkgs.nixfmt
+    pkgs.nixfmt-rfc-style
     pkgs.opencode
     pkgs.jellyfin
   ] ++ (lib.optionals isLinux [
@@ -46,6 +46,7 @@ in {
     pkgs.wlogout
     pkgs.polkit_gnome
     pkgs._1password-cli
+    pkgs.google-chrome
   ]) ++ [
     (pkgs.writeShellApplication {
       name = "random-wallpaper";

@@ -1,0 +1,64 @@
+* {
+    background-color: transparent;
+    text-color: #ffffff;
+    font: "JetBrainsMono Nerd Font 14";
+}
+
+window {
+    background-color: rgba(30, 30, 30, 0.9);
+    border: 0;
+    padding: 16px;
+    width: 600px;
+    height: 400px;
+    border-radius: 12px;
+}
+
+mainbox {
+    spacing: 16px;
+    children: [ inputbar, listview ];
+}
+
+inputbar {
+    background-color: transparent;
+    children: [ prompt, entry ];
+    spacing: 8px;
+}
+
+prompt {
+    font: "JetBrainsMono Nerd Font Bold 14";
+    vertical-align: 0.5;
+}
+
+entry {
+    placeholder: "Search...";
+    placeholder-color: #888888;
+    vertical-align: 0.5;
+}
+
+listview {
+    background-color: transparent;
+    spacing: 4px;
+    lines: 10;
+}
+
+element {
+    padding: 8px 12px;
+    border-radius: 6px;
+    spacing: 8px;
+}
+
+element selected {
+    background-color: rgba(255, 255, 255, 0.1);
+    text-color: #ffffff;
+    border: 1px;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+element-text {
+    vertical-align: 0.5;
+}
+
+element-icon {
+    size: 24px;
+    vertical-align: 0.5;
+}
