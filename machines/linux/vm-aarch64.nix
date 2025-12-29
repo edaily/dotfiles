@@ -33,6 +33,15 @@
   # This works through our custom module imported above
   virtualisation.vmware.guest.enable = true;
 
+  # Passwordless sudo for rsync (needed for make vm/copy)
+  security.sudo.extraRules = [{
+    users = [ "eugene" ];
+    commands = [{
+      command = "/run/current-system/sw/bin/rsync";
+      options = [ "NOPASSWD" ];
+    }];
+  }];
+
   # Share our host filesystem
   fileSystems."/host" = {
     fsType = "fuse./run/current-system/sw/bin/vmhgfs-fuse";

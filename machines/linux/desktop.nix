@@ -3,11 +3,10 @@
 {
   imports = [ 
     ./desktop-hardware.nix
-    ../modules/linux/wayland.nix
+    ../modules/linux/linux-base.nix
   ];
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+
 
   # Bootloader
   boot.loader.systemd-boot.enable = true;
@@ -45,8 +44,16 @@
     variant = "";
   };
 
-  # Enable OpenSSH daemon
-  services.openssh.enable = true;
+
+
+  # Passwordless sudo for rsync (needed for make desktop/copy)
+  security.sudo.extraRules = [{
+    users = [ "eugene" ];
+    commands = [{
+      command = "/run/current-system/sw/bin/rsync";
+      options = [ "NOPASSWD" ];
+    }];
+  }];
 
   # System packages
   environment.systemPackages = with pkgs; [
