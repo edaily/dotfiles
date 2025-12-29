@@ -59,4 +59,6 @@
   environment.systemPackages = with pkgs; [
     neovim
   ];
+
+  programs.dconf.enable = true;
 }

@@ -11,14 +11,7 @@ DESKTOPADDR="${DESKTOPADDR:-192.168.1.235}"
 DESKTOPPORT="${DESKTOPPORT:-22}"
 DESKTOPUSER="${DESKTOPUSER:-eugene}"
 
-SSHPASS_PREFIX=$(setup_sshpass)
 
-if [ -n "${SSHPASS_PREFIX}" ]; then
-    ${SSHPASS_PREFIX} ssh $SSH_OPTIONS -p${DESKTOPPORT} ${DESKTOPUSER}@${DESKTOPADDR} " \
-        sudo reboot now; \
-    " > /dev/null || true
-else
-    ssh $SSH_OPTIONS -p${DESKTOPPORT} ${DESKTOPUSER}@${DESKTOPADDR} " \
-        sudo reboot now; \
-    " > /dev/null || true
-fi
+ssh -t $SSH_OPTIONS -p${DESKTOPPORT} ${DESKTOPUSER}@${DESKTOPADDR} " \
+    sudo reboot now; \
+" || true

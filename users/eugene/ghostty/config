@@ -1,4 +1,4 @@
 background-opacity = 0.9
-window-decoration = true 
+window-decoration = false 
 window-padding-x = 15
 window-padding-y = 15

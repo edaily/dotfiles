@@ -11,14 +11,7 @@ DESKTOPADDR="${DESKTOPADDR:-192.168.1.235}"
 DESKTOPPORT="${DESKTOPPORT:-22}"
 DESKTOPUSER="${DESKTOPUSER:-eugene}"
 
-SSHPASS_PREFIX=$(setup_sshpass)
+ssh -t $SSH_OPTIONS -p${DESKTOPPORT} ${DESKTOPUSER}@${DESKTOPADDR} " \
+    sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/home/${DESKTOPUSER}/nix-config#desktop\" \
+"
 
-if [ -n "${SSHPASS_PREFIX}" ]; then
-    ${SSHPASS_PREFIX} ssh $SSH_OPTIONS -p${DESKTOPPORT} ${DESKTOPUSER}@${DESKTOPADDR} " \
-        sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#desktop\" \
-    " > /dev/null
-else
-    ssh $SSH_OPTIONS -p${DESKTOPPORT} ${DESKTOPUSER}@${DESKTOPADDR} " \
-        sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#desktop\" \
-    " > /dev/null
-fi
