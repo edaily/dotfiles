@@ -59,6 +59,11 @@
         user = "eugene";
       };
 
+      nixosConfigurations.desktop = mkSystem "linux/desktop" {
+        system = "x86_64-linux";
+        user = "eugene";
+      };
+
       darwinConfigurations.macbook = mkDarwin "darwin/macbook" {
         system = "aarch64-darwin";
         user = "eugene";

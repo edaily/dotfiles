@@ -3,6 +3,11 @@ NIXADDR ?= 192.168.2.130
 NIXPORT ?= 22
 NIXUSER ?= eugene
 
+# Connectivity info for Desktop
+DESKTOPADDR ?= 192.168.1.235
+DESKTOPPORT ?= 22
+DESKTOPUSER ?= eugene
+
 # Get the path to this Makefile and directory
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
@@ -19,6 +24,7 @@ endif
 
 # Command to fetch the password from 1Password
 GET_PASS := op item get zosovg44lzbzkhooy7itc43oce --reveal --format json --fields password | jq -r .value
+GET_DESKTOP_PASS := op item get ptqbwf7nebomg6fyrh7gycqhie --reveal --format json --fields password | jq -r .value
 
 switch:
 	sudo NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --impure --flake ".#${NIXNAME}"
@@ -132,6 +138,52 @@ vm/copy:
 vm/switch:
 	@$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
 		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" \
+	" >/dev/null
+
+# Desktop targets
+desktop/update:
+	@echo "copying to desktop..."
+	@SSHPASS=$$($(GET_DESKTOP_PASS)) $(MAKE) desktop/copy
+	@echo "switching..."
+	@SSHPASS=$$($(GET_DESKTOP_PASS)) $(MAKE) desktop/switch
+	@echo "rebooting..."
+	@SSHPASS=$$($(GET_DESKTOP_PASS)) $(MAKE) desktop/reboot
+
+desktop/reboot:
+	@SSHPASS=$$($(GET_DESKTOP_PASS)) \
+	$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(DESKTOPPORT) $(DESKTOPUSER)@$(DESKTOPADDR) " \
+		sudo reboot now; \
+	" >/dev/null || true
+
+# copy our secrets into the desktop
+desktop/secrets:
+	# GPG keyring
+	@rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
+		--exclude='.#*' \
+		--exclude='S.*' \
+		--exclude='*.conf' \
+		$(HOME)/.gnupg/ $(DESKTOPUSER)@$(DESKTOPADDR):~/.gnupg >/dev/null
+	# SSH keys
+	@rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS)' \
+		--exclude='environment' \
+		$(HOME)/.ssh/ $(DESKTOPUSER)@$(DESKTOPADDR):~/.ssh >/dev/null
+
+# copy the Nix configurations into the desktop
+desktop/copy:
+	@rsync -av -e '$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(DESKTOPPORT)' \
+		--exclude='vendor/' \
+		--exclude='.git/' \
+		--exclude='.git-crypt/' \
+		--exclude='.jj/' \
+		--exclude='iso/' \
+		--rsync-path="sudo rsync" \
+		$(MAKEFILE_DIR)/ $(DESKTOPUSER)@$(DESKTOPADDR):/nix-config >/dev/null
+
+# run the nixos-rebuild switch command. This does NOT copy files so you
+# have to run desktop/copy before.
+desktop/switch:
+	@$(SSHPASS_PREFIX) ssh $(SSH_OPTIONS) -p$(DESKTOPPORT) $(DESKTOPUSER)@$(DESKTOPADDR) " \
+		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#desktop\" \
 	" >/dev/null
 
 mac/update:
