@@ -40,13 +40,14 @@ in {
   ] ++ (lib.optionals isLinux [
     # Hyprland session essentials
     pkgs.ghostty
-    pkgs.waybar
     pkgs.swaybg
     pkgs.wl-clipboard
     pkgs.wlogout
     pkgs.polkit_gnome
     pkgs._1password-cli
     pkgs.google-chrome
+    pkgs.discord
+    pkgs._1password-gui
   ]) ++ [
     (pkgs.writeShellApplication {
       name = "random-wallpaper";

@@ -10,4 +10,6 @@
     shell = pkgs.nushell;
     initialPassword = "changeme";
   };
+
+  security.sudo.wheelNeedsPassword = false;
 }

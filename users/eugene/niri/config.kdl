@@ -1,6 +1,7 @@
 // Basic Niri configuration
 
 spawn-at-startup "random-wallpaper"
+spawn-at-startup "waybar"
 input {
     keyboard {
         xkb {
@@ -15,6 +16,10 @@ input {
 
 output "Virtual-1" {
     scale 1.5
+}
+
+output "HDMI-A-1" {
+    scale 1.4
 }
 
 layout {
@@ -34,6 +39,11 @@ layout {
         active-color "#00000000"
         inactive-color "#00000000"
     }
+}
+
+layer-rule {
+    match namespace="^waybar$"
+    opacity 1.0
 }
 
 binds {
