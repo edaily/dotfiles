@@ -41,11 +41,6 @@ layout {
     }
 }
 
-layer-rule {
-    match namespace="^waybar$"
-    opacity 1.0
-}
-
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 

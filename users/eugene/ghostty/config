@@ -1,4 +1,5 @@
 background-opacity = 0.9
-window-decoration = false 
+window-decoration = false
 window-padding-x = 15
 window-padding-y = 15
+background = "#11111b"

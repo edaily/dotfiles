@@ -11,7 +11,7 @@ in {
         layer = "top";
         position = "top";
         height = 30;
-        spacing = 0;
+        spacing = 10;
         
         modules-left = [ "niri/workspaces" "niri/window" ];
         modules-center = [ "clock" ];
@@ -24,32 +24,53 @@ in {
 
         "niri/workspaces" = {
           format = "{icon}";
-          "format-icons" = {
+          format-icons = {
             active = "";
             default = "";
           };
         };
-
-        clock = {
-          "tooltip-format" = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          "format-alt" = "{:%Y-%m-%d}";
-        };
-
+        
         pulseaudio = {
-          format = "vol {volume} {format_source}";
-          format-bluetooth = "volb {volume} {format_source}";
-          format-bluetooth-muted = "volb {format_source}";
-          format-muted = "vol {format_source}";
-          format-source = "mic {volume}";
-          format-source-muted = "mic";
+          tooltip = false;
+          format = "  {volume}%";
+          format-bluetooth = " {volume}%";
+          format-bluetooth-muted = " {volume}%";
+          format-muted = "X {volume}%";
+          format-source = "{volume}% ";
+          format-source-muted = " ";
+          format-icons = {
+            headphone = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = [
+              "░░░░░░░░░░"
+              "█░░░░░░░░░"
+              "██░░░░░░░░"
+              "███░░░░░░░"
+              "████░░░░░░"
+              "█████░░░░░"
+              "██████░░░░"
+              "███████░░░"
+              "████████░░"
+              "█████████░"
+              "██████████"
+            ];
+          };
+          interval = 60;
+          on-click = "pamixer --toggle-mute";
+          on-scroll-up = "pamixer --allow-boost --set-limit 150 --increase 2";
+          on-scroll-down = "pamixer --allow-boost --set-limit 150 --decrease 2";
         };
+
+
       };
     };
 
     style = ''
       window#waybar {
-          background-color: rgba(0, 0, 0, 0.9);
-          color: #ffffff;
+          background: rgba(18, 18, 28, 0.9);
+          color: #cdd6f4;
       }
 
       * {
@@ -57,7 +78,6 @@ in {
           border-radius: 0;
           font-size: 13px;
           min-height: 0;
-          font-family: "Roboto", "Font Awesome 5 Free";
       }
     '';
   };
